@@ -1,18 +1,29 @@
 import React from 'react';
-import PropType from "prop-types";
+import axios from "axios";
+import Movie from './Movie';
 
-const foodList = [{id:1,name:"a"},{id:2,name:"b"}];
+class App extends React.Component {
 
-function Food({names}){
-return <h1>헷갈린다. {names}</h1>
+state ={
+  isLoading:true,
+  movies: []
+};
+
+getMovies = async () => {
+  const {data: {data:{movies}} } = await axios.get("https://yts.mx/api/v2/list_movies.json?sort_by=rating"); 
+  this.setState({movies, isLoading:false})//es6 state/axios
+};
+
+componentDidMount(){
+  this.getMovies();
 }
 
-function foodmap(dish){
-  return<Food names ={dish.name} />
-}
-
-function App() {
- return <div>{foodList.map(foodmap)}</div>;
+  render() {
+    const { isLoading, movies} = this.state;
+    return <div>{isLoading ? "loading..": movies.map(movie => {
+    return <Movie id={movie.id} year={movie.year} title={movie.title} summary={movie.summary} poster={movie.poster}/>
+   })}</div>;
+  }
 }
 
 export default App;
